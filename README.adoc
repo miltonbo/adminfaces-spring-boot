@@ -1,4 +1,4 @@
-= Admin Template
+= Admin Template - Spring Boot
 :page-layout: base
 :source-language: java
 :icons: font
