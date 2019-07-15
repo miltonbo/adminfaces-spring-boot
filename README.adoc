@@ -20,6 +20,11 @@ image:https://badges.gitter.im/Join%20Chat.svg[link="https://gitter.im/adminface
 
 A https://javaserverfaces.java.net/[JSF^] *fully responsive* `admin template` based on http://primefaces.org/themes[Primefaces^], https://almsaeedstudio.com/themes/AdminLTE/index2.html[Admin LTE^], http://getbootstrap.com[Bootstrap^] and https://spring.io/projects/spring-boot[Spring Boot^].
 
+== About the repository
+
+This repository is based on https://github.com/adminfaces/admin-template[Admin Template repository^].
+
+That source code was modified to deploy a Spring Boot aplication.
 
 == Features
 
@@ -59,7 +64,7 @@ First include it in your classpath:
 ----
 <dependency>
     <groupId>com.github.adminfaces</groupId>
-    <artifactId>admin-template</artifactId>
+    <artifactId>adminfaces-spring-boot</artifactId>
     <version>version</version>
 </dependency>
 ----
@@ -70,6 +75,22 @@ Admin template will bring the following transitive dependencies:
 
 ----
 <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <version>${spring.boot.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-tomcat</artifactId>
+    <version>${spring.boot.version}</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+    <version>${spring.boot.version}</version>
+</dependency>
+<dependency>
     <groupId>com.github.adminfaces</groupId>
     <artifactId>admin-theme</artifactId>
     <version>version</version>
@@ -79,7 +100,6 @@ Admin template will bring the following transitive dependencies:
     <artifactId>primefaces</artifactId>
     <version>6.2</version>
 </dependency>
-
 <dependency>
     <groupId>org.omnifaces</groupId>
     <artifactId>omnifaces</artifactId>
@@ -393,7 +413,7 @@ AdminSession is a simple session scoped bean which controls whether user is logg
     }
 ----
 
-By default the user *is always logged in* and you need to override it (by using https://github.com/adminfaces/admin-starter/blob/2659e762271f9e1864bd2290f3dbf5018087eccd/src/main/java/com/github/adminfaces/starter/infra/security/LogonMB.java#L28[bean specialization^] or via injection and calling `setIsLoggedIn()` method) to change its value, see <<Overriding AdminSession>>.
+By default the user *is always logged in* and you need to implement a spring bean that is named *loginMB* and extends AdminSession class, it will be injected in the library using the name and will be used to validate the session.
 
 When isLoggedIn is `false` you got the following mechanisms activated:
 
@@ -402,74 +422,34 @@ When isLoggedIn is `false` you got the following mechanisms activated:
 
 NOTE: It is up to you to decide whether the user is logged in or not.
 
-=== Overriding AdminSession
+=== Extending AdminSession
 
-There are two ways to override AdminSession default value which is <<AdminSession Specialization, specialization>> and <<AdminSession Injection, injection>>.
+There is one way to implement the bean in your project using Spring Boot.
 
-==== AdminSession Specialization
 
-A simple way to change AdminSession logged in value is by extending it:
+=== Class LoginMB
+
+This class must extend the AdminSession class and must be named *loginMB*:
+
 
 [source,java]
 ----
-import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Specializes;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
 import com.github.adminfaces.template.session.AdminSession;
-import org.omnifaces.util.Faces;
-import java.io.Serializable;
 
-@SessionScoped
-@Specializes
-public class LogonMB extends AdminSession implements Serializable {
+@Component("loginMB")
+@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class LoginMB extends AdminSession implements Serializable {
 
     private String currentUser;
-    private String email;
-    private String password;
-    private boolean remember;
 
-
-    public void login() throws IOException {
-        currentUser = email;
-        addDetailMessage("Logged in successfully as <b>" + email + "</b>");
-        Faces.getExternalContext().getFlash().setKeepMessages(true);
-        Faces.redirect("index.xhtml");
-    }
+    ....
 
     @Override
     public boolean isLoggedIn() {
-
         return currentUser != null;
-    }
-
-    //getters&setters
-}
-----
-
-=== AdminSession Injection
-
-Another way is to inject it into your security authentication logic:
-
-
-[source,java]
-----
-import com.github.adminfaces.template.session.AdminSession;
-import org.omnifaces.util.Messages;
-import org.omnifaces.util.Faces;
-
-@SessionScoped
-@Named("authorizer")
-public class CustomAuthorizer implements Serializable {
-
-    private String currentUser;
-
-    @Inject
-    AdminSession adminSession;
-
-    public void login(String username) {
-        currentUser = username;
-        adminSession.setIsLoggedIn(true);
-        Messages.addInfo(null,"Logged in sucessfully as <b>"+username+"</b>");
-        Faces.redirect("index.xhtml");
     }
 
 }

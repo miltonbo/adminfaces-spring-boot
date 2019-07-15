@@ -10,20 +10,24 @@
     </parent>
 
     <groupId>com.github.adminfaces</groupId>
-    <artifactId>admin-template-spring-boot</artifactId>
+    <artifactId>adminfaces-spring-boot</artifactId>
     <version>1.0.0</version>
 
-    <name>admin-template</name>
+    <name>adminfaces-spring-boot</name>
     <url>https://github.com/adminfaces/admin-template</url>
 
     <description>
-        A responsive JSF template based on Admin LTE.
+        A responsive JSF template based on Admin LTE build using Spring Boot.
     </description>
 
     <developers>
         <developer>
             <name>Rafael M. Pestano</name>
             <email>rmpestanoATgmail.com</email>
+        </developer>
+        <developer>
+            <name>Milton BO</name>
+            <email>jmcm578@gmail.com</email>
         </developer>
     </developers>
 
@@ -35,9 +39,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/adminfaces/admin-template.git</connection>
-        <developerConnection>scm:git:git@github.com:adminfaces/admin-template.git</developerConnection>
-        <url>https://github.com/adminfaces/admin-template.git</url>
+        <connection>scm:git:https://github.com/MiltonBO/adminfaces-spring-boot</connection>
+        <developerConnection>scm:git:git@github.com:MiltonBO/adminfaces-spring-boot.git</developerConnection>
+        <url>https://github.com/MiltonBO/adminfaces-spring-boot</url>
     </scm>
 
     <properties>
